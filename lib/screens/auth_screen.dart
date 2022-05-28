@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -13,16 +14,21 @@ class AuthScreen extends StatefulWidget {
 class _AuthScreenState extends State<AuthScreen> {
   final _auth = FirebaseAuth.instance;
 
+  var _isLoading = false;
+
   void _submitAuthForm(
-      String email, 
-      String password, 
-      String username, 
-      bool isLogin,
-      BuildContext context,
-      ) async {
+    String email,
+    String password,
+    String username,
+    bool isLogin,
+    BuildContext context,
+  ) async {
     UserCredential userCredential;
 
     try {
+      setState(() {
+        _isLoading = true;
+      });
       if (isLogin) {
         userCredential = await _auth.signInWithEmailAndPassword(
             email: email, password: password);
@@ -30,6 +36,17 @@ class _AuthScreenState extends State<AuthScreen> {
         userCredential = await _auth.createUserWithEmailAndPassword(
             email: email, password: password);
       }
+
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userCredential.user!.uid)
+          .set({
+        'username': username,
+        'email': email,
+      });
+            setState(() {
+        _isLoading = false;
+      });
     } on PlatformException catch (err) {
       var message = 'An error occurred, please check your credentials!';
 
@@ -42,9 +59,15 @@ class _AuthScreenState extends State<AuthScreen> {
           backgroundColor: Theme.of(context).errorColor,
         ),
       );
+      setState(() {
+        _isLoading = false;
+      });
     } catch (err) {
       print(err);
-            ScaffoldMessenger.of(context).showSnackBar(
+      setState(() {
+        _isLoading = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(err.toString()),
           backgroundColor: Theme.of(context).errorColor,
@@ -59,6 +82,7 @@ class _AuthScreenState extends State<AuthScreen> {
       backgroundColor: Theme.of(context).primaryColor,
       body: AuthForm(
         submitFn: _submitAuthForm,
+        isLoading: _isLoading 
       ),
     );
   }
