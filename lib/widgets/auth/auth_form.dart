@@ -34,6 +34,7 @@ class _AuthFormState extends State<AuthForm> {
 
     void _pickedImage(File image) {
       _userImageFile = image;
+      print('_userImageFile: $_userImageFile');
     }
 
     void _trySubmit() {
@@ -41,10 +42,10 @@ class _AuthFormState extends State<AuthForm> {
       FocusScope.of(context).unfocus();
 
       if (_userImageFile == null && !_isLogin) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar( SnackBar(
-              content: const Text('Please pick an image.'),
-              backgroundColor: Theme.of(context).errorColor,));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: const Text('Please pick an image.'),
+          backgroundColor: Theme.of(context).errorColor,
+        ));
         return;
       }
 
@@ -69,7 +70,10 @@ class _AuthFormState extends State<AuthForm> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  if (!_isLogin)  UserImagePicker(imagePickFn: _pickedImage,),
+                  if (!_isLogin)
+                    UserImagePicker(
+                      imagePickFn: _pickedImage,
+                    ),
                   TextFormField(
                     key: const ValueKey('email'),
                     validator: (value) {

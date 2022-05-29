@@ -23,7 +23,8 @@ class _UserImagePickerState extends State<UserImagePicker> {
     setState(() {
       _pickedImage = File(pickedImageFile!.path);
     });
-    widget.imagePickFn(pickedImageFile as File);
+    print('_pickedImage: $_pickedImage');
+    widget.imagePickFn(_pickedImage as File);
   }
 
   @override
