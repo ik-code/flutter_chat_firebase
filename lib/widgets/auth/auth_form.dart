@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_chat_firebase/widgets/pickers/user_image_picker.dart';
 
 class AuthForm extends StatefulWidget {
   final bool isLoading;
@@ -10,7 +11,8 @@ class AuthForm extends StatefulWidget {
     BuildContext ctx,
   ) submitFn;
 
-  const AuthForm({Key? key, required this.submitFn, required this.isLoading}) : super(key: key);
+  const AuthForm({Key? key, required this.submitFn, required this.isLoading})
+      : super(key: key);
 
   @override
   _AuthFormState createState() => _AuthFormState();
@@ -52,8 +54,9 @@ class _AuthFormState extends State<AuthForm> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
+                  if(!_isLogin) const UserImagePicker(),
                   TextFormField(
-                    key: ValueKey('email'),
+                    key: const ValueKey('email'),
                     validator: (value) {
                       if (value!.isEmpty || !value.contains('@')) {
                         return 'Please enter a valid email address';
@@ -70,7 +73,7 @@ class _AuthFormState extends State<AuthForm> {
                   ),
                   if (!_isLogin)
                     TextFormField(
-                      key: ValueKey('username'),
+                      key: const ValueKey('username'),
                       validator: (value) {
                         if (value!.isEmpty || value.length < 4) {
                           return 'Please enter at least 4 characters';
@@ -83,7 +86,7 @@ class _AuthFormState extends State<AuthForm> {
                       },
                     ),
                   TextFormField(
-                    key: ValueKey('password'),
+                    key: const ValueKey('password'),
                     validator: ((value) {
                       if (value!.isEmpty || value.length < 7) {
                         return 'Password must be at least 7 characters long.';
@@ -99,27 +102,26 @@ class _AuthFormState extends State<AuthForm> {
                   const SizedBox(
                     height: 12,
                   ),
-                  if( widget.isLoading)
-                  const CircularProgressIndicator(),
-                  if( !widget.isLoading)
-                  RaisedButton(
-                    child: Text(_isLogin ? 'Login' : 'Signup'),
-                    onPressed: _trySubmit,
-                  ),
-                    if( !widget.isLoading)
-                  FlatButton(
-                    onPressed: () {
-                      setState(() {
-                        _isLogin = !_isLogin;
-                      });
+                  if (widget.isLoading) const CircularProgressIndicator(),
+                  if (!widget.isLoading)
+                    RaisedButton(
+                      child: Text(_isLogin ? 'Login' : 'Signup'),
+                      onPressed: _trySubmit,
+                    ),
+                  if (!widget.isLoading)
+                    FlatButton(
+                      onPressed: () {
+                        setState(() {
+                          _isLogin = !_isLogin;
+                        });
 
-                      print(_isLogin);
-                    },
-                    textColor: Theme.of(context).primaryColor,
-                    child: Text(_isLogin
-                        ? 'Create new account'
-                        : 'I already have an account'),
-                  )
+                        print(_isLogin);
+                      },
+                      textColor: Theme.of(context).primaryColor,
+                      child: Text(_isLogin
+                          ? 'Create new account'
+                          : 'I already have an account'),
+                    )
                 ],
               ),
             ),
